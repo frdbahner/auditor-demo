@@ -19,11 +19,6 @@ All components can be installed together on a small VM. The demo here was set up
 ### General Software 
 
 
-We need to install the usual Development Tools:
-```
-dnf group install "Development Tools"
-```
-
 Since the backend database of AUDITOR is postgresql, we need to have a current version installed and running.
 Therefore we follow the documentation in [www.postgresql.org](https://www.postgresql.org/download/linux/redhat/)
 
@@ -98,23 +93,27 @@ CREATE DATABASE
 postgres=# 
 
 ```
+## Install AUDITOR Components from WLCG repo
 
-Download the latest AUDITOR version (here we copy it from zenodo), unzip and change into the AUDITOR folder: 
+Enable the WLCG repo and install the required components:
+```
+curl https://linuxsoft.cern.ch/wlcg/RPM-GPG-KEY-wlcg > /etc/pki/rpm-gpg/RPM-GPG-KEY-wlcg
+yum-config-manager --add-repo https://linuxsoft.cern.ch/wlcg/wlcg-el9.repo
+yum-config-manager --enable wlcg
+```
+```
+### Install specific version for AUDITOR components
+export AUDITOR_VERSION=0.10.1-1
+dnf -y install auditor-${AUDITOR_VERSION} auditor_apel_plugin-${AUDITOR_VERSION} auditor_htcondor_collector-${AUDITOR_VERSION}
+```
+
+Now execute the two migration scripts. Note, that the location of these two scripts have changed between
+versions, before v0.10, they were located in ```/opt/auditor```. Change below, if needed:
 
 ```
-cd /tmp/
-curl https://zenodo.org/records/15827317/files/AUDITOR-0.9.4.zip --output AUDITOR-0.9.4.zip
 
-
-
-unzip AUDITOR-0.9.4.zip 
-cd AUDITOR-0.9.4
-```
-Now execute the two migration scripts:
-
-```
-psql -h localhost -U postgres -d auditor -f migrations/20220322080444_create_accounting_table.sql
-psql -h localhost -U postgres -d auditor -f migrations/20240503141800_convert_meta_component_to_jsonb.sql 
+psql -h localhost -U postgres -d auditor -f /usr/share/auditor/migrations/20220322080444_create_accounting_table.sql
+psql -h localhost -U postgres -d auditor -f /usr/share/auditor/migrations/20240503141800_convert_meta_component_to_jsonb.sql 
 ```
 
 Afterwards the psql auditor db should look as follows:
@@ -135,24 +134,13 @@ auditor=# \d
 auditor=# 
 ```
 
-## Install AUDITOR Components from WLCG repo
-
-Enable the WLCG repo and install the required components:
-```
-curl https://linuxsoft.cern.ch/wlcg/RPM-GPG-KEY-wlcg > /etc/pki/rpm-gpg/RPM-GPG-KEY-wlcg
-yum-config-manager --add-repo https://linuxsoft.cern.ch/wlcg/wlcg-el9.repo
-yum-config-manager --enable wlcg
-```
-```
-yum install auditor auditor_apel_plugin auditor_htcondor_collector 
-```
 ## Configuration
 
 
 ### Configure AUDITOR main component
-Adjust the auditor config file as follows:
+Adjust the auditor config file as follows, again, the location has changed with v0.10, adjust as necessary:
 ```
-vi /opt/auditor/auditor.yml
+vi /etc/auditor/auditor.yml
 ```
 with the following content:
 ```
@@ -179,8 +167,9 @@ log_level: info
 tls_config:
   use_tls: false
 ```
-Now you can start the service with the following command:
+Now you can start the service with the following commands:
 ```
+systemctl enable auditor.service
 systemctl start auditor.service
 ```
 You should see that the service is active and running:
@@ -195,15 +184,18 @@ systemctl status auditor.service
      Memory: 3.3M
         CPU: 35ms
      CGroup: /system.slice/auditor.service
-             └─91232 /usr/bin/auditor /opt/auditor/config.yml
+             └─91232 /usr/bin/auditor /etc/auditor/config.yml
 
+auditor[<pid>]: {"v":0,"name":"AUDITOR","msg":"starting service: \"actix-web-service-0.0.0.0:8000\", workers: 4, listed
+...
 ```
 
 ### Configure AUDITOR HTCondor collector
-An example config file and a unit file are shipped with the rpm installation adjust the config yaml file:
+An example config file and a unit file are shipped with the rpm installation adjust the config yaml file,
+with /opt/auditor_htcondor_collector as its path for pre-0.10 versions:
 Attention! replace: <REPLACE_WITH_HOSTHAME> with your fully qualified hostname!
 ```
-vim /opt/auditor_htcondor_collector/auditor_htcondor_collector.yml 
+vim /etc/auditor/auditor_htcondor_collector.yml 
 ```
 here I have used the example from the AUDITOR documentation
 ```
@@ -265,8 +257,13 @@ tls_config:
   use_tls: False
 
 ```
+Fix permissions on where the database will be created:
+```
+chmod 777 /opt/auditor_htcondor_collector
+```
 Start the htcondor collector service:
 ```
+systemctl enable auditor_htcondor_collector.service 
 systemctl start auditor_htcondor_collector.service 
 ```
 Checking the status you should see:
@@ -296,9 +293,10 @@ This is expected: We have no HTCondor installed and running and therefore we can
 
 
 ### Configure AUDITOR APEL plugin
-An example config file and a unit file are shipped with the rpm installation adjust the config yaml file:
+An example config file and a unit file are shipped with the rpm installation adjust the config yaml file, you might need to
+adjust paths if you run an older version:
 ```
-vim /opt/auditor_apel_plugin/auditor_apel_plugin.yml
+vim /etc/auditor_apel_plugin/auditor_apel_plugin.yml
 ```
 here I have used the example from the AUDITOR documentation
 ```
@@ -346,8 +344,6 @@ summary_fields:
       score:
         name: hepscore23
         component_name: Cores
-
-  optional:
     VO: !MetaField
       name: group
     SubmitHost: !MetaField
@@ -376,6 +372,7 @@ openssl x509 -req -days 3650 -in cert.csr -signkey cert.key -out cert.crt
 
 Start the APEL plugin service:
 ```
+systemctl enable auditor_apel_plugin
 systemctl start auditor_apel_plugin
 ```
 Checking the status you should see:
@@ -449,11 +446,12 @@ if not, restart with `condor_restart` and check again.
 ### Install pyauditor and other modules - required to create the mock data
 
 Now we can download this git repo with the mock_history_insertion.py script.
+You might need to install git via dnf.
 ```
 git clone https://github.com/ALU-Schumacher/auditor-demo.git
 ```
 
-Create a python venv e.g. in the user home dir:
+Create a python venv e.g. in the user home dir (python might be called python3):
 ```
 cd 
 python -m venv .venv
@@ -492,11 +490,11 @@ Nice! Data is in condor. Now we can run the condor-collector (or wait until the 
 Here we are impatient, we  want to execute the collector manually.
 Therefore we can call:
 ```
-/opt/auditor_htcondor_collector/venv/bin/python /opt/auditor_htcondor_collector/venv/bin/auditor-htcondor-collector --config /opt/auditor_htcondor_collector/auditor_htcondor_collector.yml --job-id  0.0
+/opt/auditor_htcondor_collector/venv/bin/python /opt/auditor_htcondor_collector/venv/bin/auditor-htcondor-collector --config /etc/auditor/auditor_htcondor_collector.yml --job-id  0.0
 ```
 you should see something like:
 ```
-/opt/auditor_htcondor_collector/venv/bin/python /opt/auditor_htcondor_collector/venv/bin/auditor-htcondor-collector --config /opt/auditor_htcondor_collector/auditor_htcondor_collector.yml --job-id  0.0
+/opt/auditor_htcondor_collector/venv/bin/python /opt/auditor_htcondor_collector/venv/bin/auditor-htcondor-collector --config /etc/auditor/auditor_htcondor_collector.yml --job-id  0.0
 
 
 2025-07-07 13:39:42,890 - auditor.collectors.htcondor - INFO     - Using AUDITOR client at localhost:8000.
@@ -512,7 +510,7 @@ Just interrupt the command with `Strg+c`.
 In order to test the entire pipeline, you can run the APEL-plugin in dry-run mode:
 
 ```
- /opt/auditor_apel_plugin/venv/bin/python /opt/auditor_apel_plugin/venv/bin/auditor-apel-publish --config /opt/auditor_apel_plugin/auditor_apel_plugin.yml --dry-run
+ /opt/auditor_apel_plugin/venv/bin/python /opt/auditor_apel_plugin/venv/bin/auditor-apel-publish --config /etc/auditor/auditor_apel_plugin.yml --dry-run
 ```
 #### Wipe the DB and re-un the AUDITOR-HTCondor collector 
 
@@ -576,7 +574,7 @@ NormalisedCpuDuration: 2382405970
 ## Accessing Data with python-auditor
 ### Access Data in ipython Session
 
-Start ipython
+Start ipython - you might need to install it with dnf:
 ```
 ipython
 ```
