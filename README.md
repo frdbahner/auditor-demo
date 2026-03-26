@@ -296,7 +296,7 @@ This is expected: We have no HTCondor installed and running and therefore we can
 An example config file and a unit file are shipped with the rpm installation adjust the config yaml file, you might need to
 adjust paths if you run an older version:
 ```
-vim /etc/auditor_apel_plugin/auditor_apel_plugin.yml
+vim /etc/auditor/auditor_apel_plugin.yml
 ```
 here I have used the example from the AUDITOR documentation
 ```
@@ -387,7 +387,7 @@ systemctl status auditor_apel_plugin.service
      Memory: 27.0M
         CPU: 455ms
      CGroup: /system.slice/auditor_apel_plugin.service
-             └─91729 //opt/auditor_apel_plugin/venv/bin/python /opt/auditor_apel_plugin/venv/bin/auditor-apel-publish --config /opt/auditor_apel_plugin/auditor_apel_plugin.yml
+             └─91729 //opt/auditor_apel_plugin/venv/bin/python /opt/auditor_apel_plugin/venv/bin/auditor-apel-publish --config /opt/auditor/auditor_apel_plugin.yml
 
 Started APEL plugin for AUDITOR.
 INFO     Enough time since last report, create new report (//opt/auditor_apel_plugin/venv/lib/python3.9/site-packages/au>
@@ -397,7 +397,7 @@ INFO     Getting records for site SITE_B with site_ids: ['site_id_3'] (//opt/aud
 INFO     No new records for SITE_B (//opt/auditor_apel_plugin/venv/lib/python3.9/site-packages/auditor_apel_plugin/publi>
 INFO     Next report scheduled for 2025-03-12 15:30:22.034452 (//opt/auditor_apel_plugin/venv/lib/python3.9/site-package>
 ```
-This is again expected, because we do not have any data and the sites `['site_id_1', 'site_id_2']`do not exist.
+This is again expected, because we do not have any data and the sites `['site_id_1', 'site_id_2']` do not exist.
 
 
 ## Adding some data to our sandbox
@@ -540,7 +540,7 @@ The script is available in this repo. execute the following command in the direc
 ```
 If you now run the auditor-apel-publish command with the --dry-run option:
 ```
-/opt/auditor_apel_plugin/venv/bin/python /opt/auditor_apel_plugin/venv/bin/auditor-apel-republish --config /opt/auditor_apel_plugin/auditor_apel_plugin.yml  --dry-run 
+/opt/auditor_apel_plugin/venv/bin/python /opt/auditor_apel_plugin/venv/bin/auditor-apel-publish --config /opt/auditor_apel_plugin/auditor_apel_plugin.yml  --dry-run 
 ```
 
 You should get a summary output as follows:
