@@ -296,13 +296,13 @@ This is expected: We have no HTCondor installed and running and therefore we can
 An example config file and a unit file are shipped with the rpm installation adjust the config yaml file, you might need to
 adjust paths if you run an older version:
 ```
-vim /etc/auditor_apel_plugin/auditor_apel_plugin.yml
+vim /etc/auditor/auditor_apel_plugin.yml
 ```
 here I have used the example from the AUDITOR documentation
 ```
 !Config
 plugin:
-  log_level: INFO
+  log_level: TRACE
   time_json_path: /opt/auditor_apel_plugin/time.json
   report_interval: 86400
   message_type: summaries
