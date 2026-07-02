@@ -302,7 +302,7 @@ here I have used the example from the AUDITOR documentation
 ```
 !Config
 plugin:
-  log_level: INFO
+  log_level: TRACE
   time_json_path: /opt/auditor_apel_plugin/time.json
   report_interval: 86400
   message_type: summaries
