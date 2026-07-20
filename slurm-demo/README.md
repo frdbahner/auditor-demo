@@ -2,7 +2,8 @@
 
 This is a mini tutorial on how to install an AUDITOR accounting pipeline from scratch using rpms.
 The pipeline consists of an Slurm collector, an AUDITOR instance with a PostgreSQL database and an APEL plugin. 
-All components can be installed together on a small VM. The demo here was set up on a VM with 1 vCore, 4GB RAM and 20 GB disc space on an Alma 9.8 OS (Olive Jaguar).  
+All components can be installed together on a small VM. The demo here was set up on a VM with 1 vCore, 4GB RAM and 20 GB disc space on an Alma 9.8 OS (Olive Jaguar).
+Please use 4GB or above RAM for testing purposes.
 
 ```
 +-----------------------+           +---------------------+           +-------------------+
@@ -199,7 +200,7 @@ auditor[<pid>]: {"v":0,"name":"AUDITOR","msg":"starting service: \"actix-web-ser
 An example config file and a unit file are shipped with the rpm installation adjust the config yaml file, you might need to
 adjust paths if you run an older version:
 ```
-vim /etc/auditor_apel_plugin/auditor_apel_plugin.yml
+vim /etc/auditor/auditor_apel_plugin.yml
 ```
 here I have used the example from the AUDITOR documentation
 ```
@@ -389,7 +390,7 @@ JobAcctGatherType=jobacct_gather/linux
 JobAcctGatherFrequency=30
 ```
 
-4. Important: confirm hostname and hostname -f on your machine actually match what you put in SlurmctldHost / NodeHostname 
+4. Important: confirm hostname -f on your machine actually match what you put in SlurmctldHost / NodeName / NodeHostname / Nodes / AccountingStorageHost
 
 ```
 hostname
@@ -450,7 +451,7 @@ PidFile=/run/slurm/slurmdbd.pid
 LogFile=/var/log/slurm/slurmdbd.log
 ```
 
-Create required directories for sluem
+Create required directories for slurm
 
 ```
 sudo chown slurm:slurm /etc/slurm/slurmdbd.conf
@@ -555,6 +556,30 @@ tls_config:
   use_tls: false
 ```
 
+For versions 0.10.1 and 0.10.2 please do the following changes to the unit file of the slurm collector as well.
+
+Put this config at `/usr/lib/systemd/system/auditor-slurm-collector.service`
+
+```
+[Unit]
+Description=Slurm collector for AUDITOR
+Documentation=https://alu-schumacher.github.io/AUDITOR/
+
+[Install]
+RequiredBy=multi-user.target
+
+[Service]
+Type=simple
+User=auditor-slurm-collector
+Group=auditor
+StateDirectory=auditor-slurm-collector
+StateDirectoryMode=0750
+WorkingDirectory=/var/lib/auditor-slurm-collector
+ExecStart=/usr/bin/auditor-slurm-collector /etc/auditor/auditor-slurm-collector.yml
+Restart=on-failure
+RestartSec=60
+```
+
 Now you can enable and start the slurm collector
 
 ```
@@ -610,6 +635,8 @@ NormalisedCpuDuration: 1530
 NumberOfJobs: 20
 
 ```
+
+The above is just a sample APEL summary generated out of mock jobs submitted to slurm.
 
 ## Accessing Data with python-auditor
 ### Access Data in ipython Session
