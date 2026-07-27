@@ -193,7 +193,7 @@ auditor[<pid>]: {"v":0,"name":"AUDITOR","msg":"starting service: \"actix-web-ser
 ### Configure AUDITOR HTCondor collector
 An example config file and a unit file are shipped with the rpm installation adjust the config yaml file,
 with /opt/auditor_htcondor_collector as its path for pre-0.10 versions:
-Attention! replace: <REPLACE_WITH_HOSTHAME> with your fully qualified hostname!
+Attention! replace: <REPLACE_WITH_HOSTNAME> with your fully qualified hostname (`hostname -f`)!
 ```
 vim /etc/auditor/auditor_htcondor_collector.yml 
 ```
@@ -205,10 +205,10 @@ timeout: 10
 state_db: htcondor_history_state.db
 record_prefix: htcondor
 interval: 900 # 15 minutes
-pool: <REPLACE_WITH_HOSTHAME>
+pool: <REPLACE_WITH_HOSTNAME>
 log_level: INFO
 schedd_names:
-  - <REPLACE_WITH_HOSTHAME>
+  - <REPLACE_WITH_HOSTNAME>
 job_status: # See https://htcondor-wiki.cs.wisc.edu/index.cgi/wiki?p=MagicNumbers
   - 3 # Removed
   - 4 # Completed
@@ -456,6 +456,7 @@ Create a python venv e.g. in the user home dir (python might be called python3):
 cd 
 python -m venv .venv
 source .venv/bin/activate
+cd auditor-demo
 ```
 Then you can install the requirements from the requirements.txt of this repo
 ```
@@ -463,7 +464,7 @@ pip install -r requirements.txt
 ```
 Now we can create the pseudo-condor data:
 ```
-python auditor-demo\mock_history_insertion.py
+python mock_history_insertion.py
 ```
 afterwards we can deactivate the env again:
 ```
@@ -540,7 +541,7 @@ The script is available in this repo. execute the following command in the direc
 ```
 If you now run the auditor-apel-publish command with the --dry-run option:
 ```
-/opt/auditor_apel_plugin/venv/bin/python /opt/auditor_apel_plugin/venv/bin/auditor-apel-publish --config /opt/auditor_apel_plugin/auditor_apel_plugin.yml  --dry-run 
+/opt/auditor_apel_plugin/venv/bin/python /opt/auditor_apel_plugin/venv/bin/auditor-apel-publish --config /etc/auditor/auditor_apel_plugin.yml  --dry-run
 ```
 
 You should get a summary output as follows:

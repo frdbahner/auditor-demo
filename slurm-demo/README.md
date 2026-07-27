@@ -290,7 +290,7 @@ systemctl status auditor_apel_plugin.service
      Memory: 27.0M
         CPU: 455ms
      CGroup: /system.slice/auditor_apel_plugin.service
-             └─91729 //opt/auditor_apel_plugin/venv/bin/python /opt/auditor_apel_plugin/venv/bin/auditor-apel-publish --config /opt/auditor_apel_plugin/auditor_apel_plugin.yml
+             └─91729 //opt/auditor_apel_plugin/venv/bin/python /opt/auditor_apel_plugin/venv/bin/auditor-apel-publish --config /etc/auditor/auditor_apel_plugin.yml
 
 ```
 
