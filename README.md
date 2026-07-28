@@ -387,7 +387,7 @@ systemctl status auditor_apel_plugin.service
      Memory: 27.0M
         CPU: 455ms
      CGroup: /system.slice/auditor_apel_plugin.service
-             └─91729 //opt/auditor_apel_plugin/venv/bin/python /opt/auditor_apel_plugin/venv/bin/auditor-apel-publish --config /opt/auditor/auditor_apel_plugin.yml
+             └─91729 //opt/auditor_apel_plugin/venv/bin/python /opt/auditor_apel_plugin/venv/bin/auditor-apel-publish --config /etc/auditor/auditor_apel_plugin.yml
 
 Started APEL plugin for AUDITOR.
 INFO     Enough time since last report, create new report (//opt/auditor_apel_plugin/venv/lib/python3.9/site-packages/au>
