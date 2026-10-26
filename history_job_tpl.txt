@@ -37,7 +37,7 @@ ExitBySignal = false
 ExitCode = 0
 ExitStatus = 0
 GPUsProvisioned = 0
-GlobalJobId = "ce.{8}.uni.de#{10}#{4}"
+GlobalJobId = "ce.{8}.uni.de#{10}.{10}#{4}"
 ImageSize = 7500000
 ImageSize_RAW = 5011312
 In = "/dev/null"
@@ -132,5 +132,5 @@ TransferOutputStats = [ CedarFilesCountTotal = 4; CedarFilesCountLastRun = 4 ]
 User = "{2}@{8}.uni.de"
 UserLog = "/ce_home/arc/sessiondir/{1}/log"
 WhenToTransferOutput = "ON_EXIT_OR_EVICT"
-x509UserProxyVOName = "{11}"
+VoName = "{11}"
 *** Offset = 0 ClusterId = {5} ProcId = 0 Owner = "{2}" CompletionDate = {4}"""
