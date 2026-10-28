@@ -52,7 +52,7 @@ async def generate_mock_data(num_records, start_time):
 
         hepscore = [10, 12, 22, 28]
 
-        cpu_score = Score("hepscore23", random.choice(hepscore))
+        cpu_score = Score("HEPscore23", random.choice(hepscore))
         
         cpu_component = Component("Cores", cpu_amount).with_score(cpu_score)
 
@@ -60,7 +60,7 @@ async def generate_mock_data(num_records, start_time):
         
         # --- Component 2: MEM ---
         cpu_time =  (wallclock_time - random.randint(10, wallclock_time//50 )) if wallclock_time > 10 else wallclock_time - 5
-        cpu_time_component = Component("CPUTime", int(cpu_time))  # no scores
+        cpu_time_component = Component("TotalCPU", int(cpu_time))  # no scores
         
         wallclock_time_component = Component("WallclockTime", int(wallclock_time))
 
@@ -76,10 +76,11 @@ async def generate_mock_data(num_records, start_time):
         user_id = f"user-{i}"
 
         meta = Meta()
+        meta = meta.insert("voms", ["/"+group_id])
         meta = meta.insert("group", [group_id])
         meta = meta.insert("site", [site_id])
         meta = meta.insert("user", [user_id])
-        meta = meta.insert("submithost", ["GlobalJobId"])
+        meta = meta.insert("headnode", ["GlobalJobId"])
         meta = meta.insert("infrastructure", ["grid"])
 
         # Attach meta

@@ -71,7 +71,7 @@ LastRemoteHost = "slot1_84@{8}@node001"
 LastRemoteWallClockTime = {0}
 LastSuspensionTime = 0
 LeaveJobInQueue = false
-MachineAttrHEPscore230 = {9}
+MachineAttrApelSpecs0 = "HEPscore23={9}"
 MaxHosts = 1
 MemoryProvisioned = 4096
 MemoryUsage = ((ResidentSetSize + 1023) / 1024)
@@ -132,5 +132,6 @@ TransferOutputStats = [ CedarFilesCountTotal = 4; CedarFilesCountLastRun = 4 ]
 User = "{2}@{8}.uni.de"
 UserLog = "/ce_home/arc/sessiondir/{1}/log"
 WhenToTransferOutput = "ON_EXIT_OR_EVICT"
-VoName = "{11}"
+VoName = "/{11}/Role=production"
+NodeCount = {12}
 *** Offset = 0 ClusterId = {5} ProcId = 0 Owner = "{2}" CompletionDate = {4}"""

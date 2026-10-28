@@ -33,6 +33,7 @@ def generate_mock_data(num_records, start_time, filename):
         group_id = np.random.choice(["lhcb", "cms", "ilc", "atlas"])
         site_id = np.random.choice(["site_id_1", "site_id_2", "site_id_3"])
         user_nr = np.random.randint(1,10)
+        node_nr = np.random.randint(1,8)
         user = f"user-{group_id}-{user_nr:03d}"
         record_id = f"htcondor-{i}"
         hours_to_add = generate_stop_time_duration(normal)
@@ -52,7 +53,8 @@ def generate_mock_data(num_records, start_time, filename):
                                site_id,
                                hepscore23,
                                i,
-                               group_id
+                               group_id,
+                               node_nr
                             )
                  )
         start_time = start_time + timedelta(seconds=60)
