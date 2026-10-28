@@ -64,10 +64,17 @@ async def generate_mock_data(num_records, start_time):
         
         wallclock_time_component = Component("WallclockTime", int(wallclock_time))
 
+        # --- Component 3: Nodes ---
+        node_nr = random.randint(1,8)
+        number_nodes_component = Component("NNodes", node_nr)  # no scores
+
         # Add components to the record
         record = record.with_component(cpu_component)
         record = record.with_component(cpu_time_component)
         record = record.with_component(wallclock_time_component)
+        record = record.with_component(number_nodes_component)
+
+
 
 
         # --- Meta ---
